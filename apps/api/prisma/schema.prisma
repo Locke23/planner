@@ -1,0 +1,252 @@
+generator client {
+  provider = "prisma-client-js"
+  // Output to workspace root node_modules so the binary is found at runtime.
+  // process.cwd() = workspace root when `nx serve api` is called, so Prisma
+  // searches node_modules/.prisma/client relative to the workspace root.
+  output   = "../../../node_modules/@prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Identity & Access ─────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String
+  passwordHash String   @map("password_hash")
+  avatarUrl    String?  @map("avatar_url")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  ownedWorkspaces Workspace[]
+  memberships     Member[]
+  assignedIssues  Issue[]        @relation("Assignee")
+  createdIssues   Issue[]        @relation("CreatedBy")
+  comments        Comment[]
+  reactions       Reaction[]
+  activities      Activity[]
+  notifications   Notification[]
+
+  @@map("users")
+}
+
+model Workspace {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  ownerId   String   @map("owner_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  owner       User         @relation(fields: [ownerId], references: [id])
+  members     Member[]
+  invitations Invitation[]
+  projects    Project[]
+
+  @@map("workspaces")
+}
+
+model Member {
+  workspaceId String   @map("workspace_id")
+  userId      String   @map("user_id")
+  role        Role
+  joinedAt    DateTime @default(now()) @map("joined_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([workspaceId, userId])
+  @@map("members")
+}
+
+model Invitation {
+  id          String    @id @default(uuid())
+  workspaceId String    @map("workspace_id")
+  email       String
+  role        Role
+  token       String    @unique
+  expiresAt   DateTime  @map("expires_at")
+  acceptedAt  DateTime? @map("accepted_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@map("invitations")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+// ── Project Management ────────────────────────────────────────────────────────
+
+model Project {
+  id          String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  name        String
+  description String?
+  identifier  String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  statuses  Status[]
+  labels    Label[]
+  issues    Issue[]
+
+  @@unique([workspaceId, identifier])
+  @@map("projects")
+}
+
+model Status {
+  id        String     @id @default(uuid())
+  projectId String     @map("project_id")
+  name      String
+  color     String
+  type      StatusType
+  position  Int        @default(0)
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues  Issue[]
+
+  @@unique([projectId, name])
+  @@map("statuses")
+}
+
+enum StatusType {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+model Label {
+  id        String @id @default(uuid())
+  projectId String @map("project_id")
+  name      String
+  color     String
+
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issueLabels IssueLabel[]
+
+  @@unique([projectId, name])
+  @@map("labels")
+}
+
+model Issue {
+  id          String   @id @default(uuid())
+  projectId   String   @map("project_id")
+  workspaceId String   @map("workspace_id")
+  number      Int
+  title       String
+  description String?
+  statusId    String   @map("status_id")
+  assigneeId  String?  @map("assignee_id")
+  priority    Priority @default(NO_PRIORITY)
+  createdBy   String   @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  project    Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status     Status       @relation(fields: [statusId], references: [id])
+  assignee   User?        @relation("Assignee", fields: [assigneeId], references: [id])
+  creator    User         @relation("CreatedBy", fields: [createdBy], references: [id])
+  labels     IssueLabel[]
+  comments   Comment[]
+  activities Activity[]
+
+  @@unique([projectId, number])
+  @@index([workspaceId])
+  @@index([assigneeId])
+  @@index([statusId])
+  @@map("issues")
+}
+
+enum Priority {
+  NO_PRIORITY
+  URGENT
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model IssueLabel {
+  issueId String @map("issue_id")
+  labelId String @map("label_id")
+
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  label Label @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([issueId, labelId])
+  @@map("issue_labels")
+}
+
+// ── Collaboration ─────────────────────────────────────────────────────────────
+
+model Comment {
+  id        String    @id @default(uuid())
+  issueId   String    @map("issue_id")
+  authorId  String    @map("author_id")
+  content   String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  issue     Issue      @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  author    User       @relation(fields: [authorId], references: [id])
+  reactions Reaction[]
+
+  @@index([issueId])
+  @@map("comments")
+}
+
+model Reaction {
+  commentId String @map("comment_id")
+  userId    String @map("user_id")
+  emoji     String
+
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([commentId, userId, emoji])
+  @@map("reactions")
+}
+
+model Activity {
+  id        String   @id @default(uuid())
+  issueId   String   @map("issue_id")
+  actorId   String   @map("actor_id")
+  type      String
+  changes   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  issue Issue @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  actor User  @relation(fields: [actorId], references: [id])
+
+  @@index([issueId])
+  @@map("activities")
+}
+
+// ── Notifications ─────────────────────────────────────────────────────────────
+
+model Notification {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  type          String
+  referenceId   String    @map("reference_id")
+  referenceType String    @map("reference_type")
+  readAt        DateTime? @map("read_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
+}
