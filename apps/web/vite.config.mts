@@ -3,19 +3,23 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
+import { parseViteEnv } from './vite-env';
 
-export default defineConfig(() => ({
+export default defineConfig(({ mode }) => {
+  const env = parseViteEnv(mode, import.meta.dirname);
+
+  return {
   root: import.meta.dirname,
   cacheDir: '../../node_modules/.vite/apps/web',
   server: {
-    port: 4200,
+    port: env.VITE_PORT,
     host: 'localhost',
     proxy: {
-      '/api': 'http://localhost:3000',
+      '/api': env.API_PROXY_TARGET,
     },
   },
   preview: {
-    port: 4200,
+    port: env.VITE_PORT,
     host: 'localhost',
   },
   plugins: [
@@ -38,4 +42,5 @@ export default defineConfig(() => ({
       transformMixedEsModules: true,
     },
   },
-}));
+  };
+});

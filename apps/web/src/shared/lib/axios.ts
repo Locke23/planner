@@ -1,10 +1,9 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { config } from '../config/env';
 import { token } from './token';
 
-const BASE_URL = '/api/v1';
-
 export const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: config.apiBaseUrl,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -23,7 +22,7 @@ api.interceptors.response.use(
       original._retry = true;
       try {
         const { data } = await axios.post<{ accessToken: string }>(
-          `${BASE_URL}/auth/refresh`,
+          `${config.apiBaseUrl}/auth/refresh`,
           null,
           { withCredentials: true },
         );

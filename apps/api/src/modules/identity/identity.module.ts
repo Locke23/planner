@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AppConfigService } from '../../config/app-config.service';
 
 // Domain
 import { USER_REPOSITORY } from './domain/repositories/iuser.repository';
@@ -53,7 +53,6 @@ const QUERY_HANDLERS = [
 
 @Module({
   imports: [
-    ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({}),
   ],
@@ -67,9 +66,8 @@ const QUERY_HANDLERS = [
     // Redis client
     {
       provide: REDIS_CLIENT,
-      useFactory: (config: ConfigService) =>
-        new Redis(config.getOrThrow<string>('REDIS_URL')),
-      inject: [ConfigService],
+      useFactory: (config: AppConfigService) => new Redis(config.redisUrl),
+      inject: [AppConfigService],
     },
 
     // Auth

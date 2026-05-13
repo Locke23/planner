@@ -12,24 +12,28 @@ import { LoginDto } from '../dtos/login.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { User } from '../../domain/entities/user.entity';
+import { AppConfigService } from '../../../../config/app-config.service';
 
 const REFRESH_COOKIE = 'refreshToken';
 
-const cookieOptions = {
-  httpOnly: true,
-  secure: process.env['NODE_ENV'] === 'production',
-  sameSite: 'strict' as const,
-  path: '/',
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-};
-
 @Controller('auth')
 export class AuthController {
+  private readonly cookieOptions;
+
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
     private readonly authService: AuthService,
-  ) {}
+    private readonly config: AppConfigService,
+  ) {
+    this.cookieOptions = {
+      httpOnly: true,
+      secure: config.isProduction,
+      sameSite: 'strict' as const,
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    };
+  }
 
   @Post('register')
   async register(

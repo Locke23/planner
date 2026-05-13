@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 import * as bcrypt from 'bcryptjs';
+import { AppConfigService } from '../../../../config/app-config.service';
 import { USER_REPOSITORY } from '../../domain/repositories/iuser.repository';
 import type { IUserRepository } from '../../domain/repositories/iuser.repository';
 import { RedisTokenService } from './redis-token.service';
@@ -14,7 +14,7 @@ export class AuthService {
   constructor(
     @Inject(USER_REPOSITORY) private readonly users: IUserRepository,
     private readonly jwt: JwtService,
-    private readonly config: ConfigService,
+    private readonly config: AppConfigService,
     private readonly tokenStore: RedisTokenService,
   ) {}
 
@@ -71,7 +71,7 @@ export class AuthService {
       {
         privateKey: this.getPrivateKey(),
         algorithm: 'RS256',
-        expiresIn: (this.config.get('JWT_ACCESS_EXPIRY') ?? '15m') as any,
+        expiresIn: this.config.jwtAccessExpiry as any,
       },
     );
   }
@@ -87,16 +87,10 @@ export class AuthService {
   }
 
   private getPrivateKey(): string {
-    return Buffer.from(
-      this.config.getOrThrow<string>('JWT_PRIVATE_KEY'),
-      'base64',
-    ).toString('utf-8');
+    return this.config.jwtPrivateKey;
   }
 
   private getPublicKey(): string {
-    return Buffer.from(
-      this.config.getOrThrow<string>('JWT_PUBLIC_KEY'),
-      'base64',
-    ).toString('utf-8');
+    return this.config.jwtPublicKey;
   }
 }
