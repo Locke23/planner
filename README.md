@@ -194,8 +194,8 @@ See [`planner-implementation-plan.MD`](./planner-implementation-plan.MD) for the
 | Phase | Scope | Status |
 |---|---|---|
 | 1 — Foundation | Monorepo, local dev, CI | ✅ Done |
-| 2 — Identity & Access | Auth, workspaces, RBAC | 🔲 Next |
-| 3 — Project Management | Issues, Kanban board | 🔲 Planned |
+| 2 — Identity & Access | Auth, workspaces, RBAC | ✅ Done |
+| 3 — Project Management | Issues, Kanban board | 🔲 Next |
 | 4 — Real-Time | WebSocket, presence | 🔲 Planned |
 | 5 — Collaboration | Comments, activity, notifications | 🔲 Planned |
 | 6 — Infrastructure | AWS, Terraform | 🔲 Planned |
