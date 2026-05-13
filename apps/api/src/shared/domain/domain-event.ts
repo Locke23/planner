@@ -1,6 +1,5 @@
 export interface IDomainEvent {
-  readonly eventId: string;
+  readonly type: string;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly eventType: string;
 }

@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
-import { IDomainEvent } from '../domain/domain-event';
 import { BaseAggregate } from '../domain/base-aggregate';
 
 @Injectable()
