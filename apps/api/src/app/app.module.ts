@@ -4,6 +4,7 @@ import { validateEnv } from '../config/env';
 import { AppConfigModule } from '../config/app-config.module';
 import { SharedModule } from '../shared/shared.module';
 import { IdentityModule } from '../modules/identity/identity.module';
+import { ProjectModule } from '../modules/project/project.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { IdentityModule } from '../modules/identity/identity.module';
     AppConfigModule,
     SharedModule,
     IdentityModule,
+    ProjectModule,
   ],
 })
 export class AppModule {}
