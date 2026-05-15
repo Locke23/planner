@@ -1,6 +1,10 @@
 import { api } from '../../../shared/lib/axios';
 import type {
-  CreateWorkspaceDto, WorkspaceDto, MemberDto, InviteMemberDto, InvitationResponse,
+  CreateWorkspaceDto,
+  WorkspaceDto,
+  WorkspaceMemberDto,
+  InviteMemberDto,
+  InvitationResponse,
 } from '@org/shared-types';
 
 export async function createWorkspace(dto: CreateWorkspaceDto): Promise<WorkspaceDto> {
@@ -18,8 +22,8 @@ export async function getWorkspace(slug: string): Promise<WorkspaceDto> {
   return data;
 }
 
-export async function getWorkspaceMembers(slug: string): Promise<MemberDto[]> {
-  const { data } = await api.get<MemberDto[]>(`/workspaces/${slug}/members`);
+export async function getWorkspaceMembers(slug: string): Promise<WorkspaceMemberDto[]> {
+  const { data } = await api.get<WorkspaceMemberDto[]>(`/workspaces/${slug}/members`);
   return data;
 }
 
