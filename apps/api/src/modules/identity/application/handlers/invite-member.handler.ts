@@ -17,8 +17,6 @@ export class InviteMemberHandler implements ICommandHandler<InviteMemberCommand>
   async execute(cmd: InviteMemberCommand): Promise<InvitationRecord> {
     const workspace = await this.workspaces.findById(cmd.workspaceId);
     if (!workspace) throw new NotFoundException('Workspace not found');
-    const actor = workspace.getMember(cmd.actorId);
-    if (!actor || !['OWNER', 'ADMIN'].includes(actor.role)) throw new ForbiddenException('Insufficient permissions');
     const invitation: InvitationRecord = {
       id: randomUUID(),
       workspaceId: cmd.workspaceId,

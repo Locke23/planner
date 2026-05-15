@@ -71,7 +71,7 @@ export class AuthService {
       {
         privateKey: this.getPrivateKey(),
         algorithm: 'RS256',
-        expiresIn: this.config.jwtAccessExpiry as any,
+        expiresIn: this.config.jwtAccessExpiry,
       },
     );
   }
@@ -80,7 +80,7 @@ export class AuthService {
     const jti = randomUUID();
     const token = this.jwt.sign(
       { sub: userId, jti },
-      { privateKey: this.getPrivateKey(), algorithm: 'RS256', expiresIn: '7d' as any },
+      { privateKey: this.getPrivateKey(), algorithm: 'RS256', expiresIn: this.config.jwtRefreshExpiry },
     );
     await this.tokenStore.store(userId, jti, REFRESH_TTL_SECONDS);
     return token;

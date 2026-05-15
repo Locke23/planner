@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { type Invitation, Role } from '@prisma/client';
 import { PrismaService } from '../../../../shared/infra/prisma.service';
 import { IInvitationRepository, InvitationRecord } from '../../domain/repositories/iinvitation.repository';
 
@@ -18,7 +19,7 @@ export class PrismaInvitationRepository implements IInvitationRepository {
         id: inv.id,
         workspaceId: inv.workspaceId,
         email: inv.email,
-        role: inv.role as any,
+        role: inv.role as Role,
         token: inv.token,
         expiresAt: inv.expiresAt,
         createdAt: inv.createdAt,
@@ -31,7 +32,7 @@ export class PrismaInvitationRepository implements IInvitationRepository {
     await this.prisma.invitation.update({ where: { id }, data: { acceptedAt: new Date() } });
   }
 
-  private toRecord(row: any): InvitationRecord {
+  private toRecord(row: Invitation): InvitationRecord {
     return {
       id: row.id,
       workspaceId: row.workspaceId,

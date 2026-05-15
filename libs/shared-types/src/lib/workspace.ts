@@ -21,6 +21,16 @@ export interface MemberDto {
   joinedAt: string;
 }
 
+// Enriched member returned by the list-members endpoint (JOIN with users table)
+export interface WorkspaceMemberDto {
+  id: string;       // userId
+  name: string;
+  email: string;
+  avatarUrl: string | null;
+  role: MemberRole;
+  joinedAt: string;
+}
+
 export interface InviteMemberDto {
   email: string;
   role: 'ADMIN' | 'MEMBER';

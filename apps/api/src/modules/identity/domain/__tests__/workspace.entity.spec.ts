@@ -31,10 +31,10 @@ describe('Workspace', () => {
       expect(ws.hasMember('user-2')).toBe(true);
     });
 
-    it('updates role if member already exists', () => {
+    it('does not change role if member already exists', () => {
       ws.addMemberDirectly('user-2', 'MEMBER');
       ws.addMemberDirectly('user-2', 'ADMIN');
-      expect(ws.getMember('user-2')!.role).toBe('ADMIN');
+      expect(ws.getMember('user-2')!.role).toBe('MEMBER');
     });
   });
 

@@ -1,10 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { AcceptInvitationCommand } from '../commands/accept-invitation.command';
 import { WORKSPACE_REPOSITORY } from '../../domain/repositories/iworkspace.repository';
 import type { IWorkspaceRepository } from '../../domain/repositories/iworkspace.repository';
 import { INVITATION_REPOSITORY } from '../../domain/repositories/iinvitation.repository';
 import type { IInvitationRepository } from '../../domain/repositories/iinvitation.repository';
+import { USER_REPOSITORY } from '../../domain/repositories/iuser.repository';
+import type { IUserRepository } from '../../domain/repositories/iuser.repository';
 import { EventBusService } from '../../../../shared/infra/event-bus.service';
 
 @CommandHandler(AcceptInvitationCommand)
@@ -12,6 +14,7 @@ export class AcceptInvitationHandler implements ICommandHandler<AcceptInvitation
   constructor(
     @Inject(WORKSPACE_REPOSITORY) private readonly workspaces: IWorkspaceRepository,
     @Inject(INVITATION_REPOSITORY) private readonly invitations: IInvitationRepository,
+    @Inject(USER_REPOSITORY) private readonly users: IUserRepository,
     private readonly eventBus: EventBusService,
   ) {}
 
@@ -19,6 +22,10 @@ export class AcceptInvitationHandler implements ICommandHandler<AcceptInvitation
     const invitation = await this.invitations.findByToken(cmd.token);
     if (!invitation || invitation.acceptedAt || invitation.expiresAt < new Date()) {
       throw new NotFoundException('Invalid or expired invitation');
+    }
+    const user = await this.users.findById(cmd.userId);
+    if (!user || user.email.value !== invitation.email) {
+      throw new ForbiddenException('Invitation was not issued to this account');
     }
     const workspace = await this.workspaces.findById(invitation.workspaceId);
     if (!workspace) throw new NotFoundException('Workspace not found');

@@ -2,7 +2,7 @@ import {
   Controller, Post, Body, Get, UseGuards,
   HttpCode, HttpStatus, Req, Res, UnauthorizedException,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../../application/commands/register-user.command';
 import { GetCurrentUserQuery } from '../../application/queries/get-current-user.query';
@@ -20,19 +20,21 @@ const REFRESH_COOKIE = 'refreshToken';
 export class AuthController {
   private readonly cookieOptions;
 
+  private readonly cookieBase;
+
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
     private readonly authService: AuthService,
-    private readonly config: AppConfigService,
+    config: AppConfigService,
   ) {
-    this.cookieOptions = {
+    this.cookieBase = {
       httpOnly: true,
       secure: config.isProduction,
       sameSite: 'strict' as const,
       path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
     };
+    this.cookieOptions = { ...this.cookieBase, maxAge: 7 * 24 * 60 * 60 * 1000 };
   }
 
   @Post('register')
@@ -44,7 +46,7 @@ export class AuthController {
       new RegisterUserCommand(dto.email, dto.name, dto.password),
     );
     const { accessToken, refreshToken } = await this.authService.login(user.id, user.email.value);
-    res.cookie(REFRESH_COOKIE, refreshToken, cookieOptions);
+    res.cookie(REFRESH_COOKIE, refreshToken, this.cookieOptions);
     return { user: this.serializeUser(user), accessToken };
   }
 
@@ -57,7 +59,7 @@ export class AuthController {
     const user = await this.authService.validateUser(dto.email, dto.password);
     if (!user) throw new UnauthorizedException('Invalid credentials');
     const { accessToken, refreshToken } = await this.authService.login(user.id, user.email.value);
-    res.cookie(REFRESH_COOKIE, refreshToken, cookieOptions);
+    res.cookie(REFRESH_COOKIE, refreshToken, this.cookieOptions);
     return { user: this.serializeUser(user), accessToken };
   }
 
@@ -71,7 +73,7 @@ export class AuthController {
     if (!token) throw new UnauthorizedException('No refresh token');
     const payload = this.authService.verifyRefreshToken(token);
     const { accessToken, refreshToken } = await this.authService.refresh(payload.sub, payload.jti);
-    res.cookie(REFRESH_COOKIE, refreshToken, cookieOptions);
+    res.cookie(REFRESH_COOKIE, refreshToken, this.cookieOptions);
     return { accessToken };
   }
 
@@ -88,7 +90,7 @@ export class AuthController {
         await this.authService.logout(payload.sub, payload.jti);
       } catch { /* invalid token — still clear the cookie */ }
     }
-    res.clearCookie(REFRESH_COOKIE, { path: '/' });
+    res.clearCookie(REFRESH_COOKIE, this.cookieBase);
   }
 
   @Get('me')

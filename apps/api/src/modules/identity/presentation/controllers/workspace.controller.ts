@@ -9,7 +9,6 @@ import { InviteMemberCommand } from '../../application/commands/invite-member.co
 import { AcceptInvitationCommand } from '../../application/commands/accept-invitation.command';
 import { RemoveMemberCommand } from '../../application/commands/remove-member.command';
 import { ChangeMemberRoleCommand } from '../../application/commands/change-member-role.command';
-import { GetWorkspaceQuery } from '../../application/queries/get-workspace.query';
 import { GetWorkspaceMembersQuery } from '../../application/queries/get-workspace-members.query';
 import { ListWorkspacesQuery } from '../../application/queries/list-workspaces.query';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
@@ -21,7 +20,7 @@ import { InviteMemberDto } from '../dtos/invite-member.dto';
 import { ChangeMemberRoleDto } from '../dtos/change-member-role.dto';
 import { RoleValue } from '../../domain/value-objects/role.vo';
 import { Workspace } from '../../domain/entities/workspace.entity';
-import { Member } from '../../domain/entities/member.entity';
+import type { WorkspaceMemberView } from '../../application/handlers/get-workspace-members.handler';
 import type { InvitationRecord } from '../../domain/repositories/iinvitation.repository';
 
 interface WorkspaceRequest extends ExpressRequest {
@@ -52,9 +51,8 @@ export class WorkspaceController {
 
   @Get(':slug')
   @UseGuards(WorkspaceRoleGuard)
-  async getOne(@Param('slug') slug: string, @CurrentUser() user: { userId: string }) {
-    const ws: Workspace = await this.queryBus.execute(new GetWorkspaceQuery(slug, user.userId));
-    return this.serialize(ws);
+  async getOne(@Request() req: WorkspaceRequest) {
+    return this.serialize(req.workspace);
   }
 
   @Post('invitations/:token/accept')
@@ -67,10 +65,10 @@ export class WorkspaceController {
   @UseGuards(WorkspaceRoleGuard)
   async getMembers(@Request() req: WorkspaceRequest, @CurrentUser() user: { userId: string }) {
     const ws: Workspace = req.workspace;
-    const members: Member[] = await this.queryBus.execute(
+    const members: WorkspaceMemberView[] = await this.queryBus.execute(
       new GetWorkspaceMembersQuery(ws.id, user.userId),
     );
-    return members.map(m => ({ userId: m.userId, role: m.role, joinedAt: m.joinedAt }));
+    return members;
   }
 
   @Post(':slug/invitations')

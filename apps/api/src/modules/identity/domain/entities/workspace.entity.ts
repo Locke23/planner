@@ -59,7 +59,7 @@ export class Workspace extends BaseAggregate {
 
   addMemberDirectly(userId: string, role: string): Member {
     const existing = this.getMember(userId);
-    if (existing) { existing.changeRole(role); return existing; }
+    if (existing) return existing;
     const member = new Member(userId, this.id, role);
     this._members.push(member);
     this.setUpdatedAt(new Date());
