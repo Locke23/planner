@@ -36,6 +36,10 @@ export class AppConfigService {
     return this.config.get('JWT_ACCESS_EXPIRY', { infer: true });
   }
 
+  get jwtRefreshExpiry(): string {
+    return this.config.get('JWT_REFRESH_EXPIRY', { infer: true });
+  }
+
   get corsOrigin(): string {
     return this.config.get('CORS_ORIGIN', { infer: true });
   }
