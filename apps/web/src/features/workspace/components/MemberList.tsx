@@ -48,11 +48,11 @@ export function MemberList({ slug }: Props) {
         </Table.Header>
         <Table.Body>
           {members?.map((m) => (
-            <Table.Row key={m.userId}>
+            <Table.Row key={m.id}>
               <Table.Cell>
                 <Flex align="center" gap="2">
-                  <Avatar size="1" fallback={m.userId[0].toUpperCase()} />
-                  <Text size="2">{m.userId}</Text>
+                  <Avatar size="1" fallback={m.name[0].toUpperCase()} />
+                  <Text size="2">{m.name}</Text>
                 </Flex>
               </Table.Cell>
               <Table.Cell>
@@ -61,12 +61,12 @@ export function MemberList({ slug }: Props) {
                 </Badge>
               </Table.Cell>
               <Table.Cell>
-                {me && m.userId !== me.id && (
+                {me && m.id !== me.id && (
                   <IconButton
                     size="1"
                     variant="ghost"
                     color="red"
-                    onClick={() => remove.mutate(m.userId)}
+                    onClick={() => remove.mutate(m.id)}
                   >
                     <Cross2Icon />
                   </IconButton>
