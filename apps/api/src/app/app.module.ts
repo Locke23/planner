@@ -5,6 +5,7 @@ import { AppConfigModule } from '../config/app-config.module';
 import { SharedModule } from '../shared/shared.module';
 import { IdentityModule } from '../modules/identity/identity.module';
 import { ProjectModule } from '../modules/project/project.module';
+import { IssueModule } from '../modules/issue/issue.module';
 import { StatusModule } from '../modules/status/status.module';
 
 @Module({
@@ -14,6 +15,7 @@ import { StatusModule } from '../modules/status/status.module';
     SharedModule,
     IdentityModule,
     ProjectModule,
+    IssueModule,
     StatusModule,
   ],
 })
