@@ -14,6 +14,9 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkspaceSlugIndexRouteImport } from './routes/$workspaceSlug/index'
 import { Route as WorkspaceSlugSettingsRouteImport } from './routes/$workspaceSlug/settings'
+import { Route as WorkspaceSlugProjectIdListRouteImport } from './routes/$workspaceSlug/$projectId/list'
+import { Route as WorkspaceSlugProjectIdBoardRouteImport } from './routes/$workspaceSlug/$projectId/board'
+import { Route as WorkspaceSlugProjectIdIssuesIssueNumberRouteImport } from './routes/$workspaceSlug/$projectId/issues/$issueNumber'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -40,6 +43,24 @@ const WorkspaceSlugSettingsRoute = WorkspaceSlugSettingsRouteImport.update({
   path: '/$workspaceSlug/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceSlugProjectIdListRoute =
+  WorkspaceSlugProjectIdListRouteImport.update({
+    id: '/$workspaceSlug/$projectId/list',
+    path: '/$workspaceSlug/$projectId/list',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const WorkspaceSlugProjectIdBoardRoute =
+  WorkspaceSlugProjectIdBoardRouteImport.update({
+    id: '/$workspaceSlug/$projectId/board',
+    path: '/$workspaceSlug/$projectId/board',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const WorkspaceSlugProjectIdIssuesIssueNumberRoute =
+  WorkspaceSlugProjectIdIssuesIssueNumberRouteImport.update({
+    id: '/$workspaceSlug/$projectId/issues/$issueNumber',
+    path: '/$workspaceSlug/$projectId/issues/$issueNumber',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +68,9 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/$workspaceSlug/settings': typeof WorkspaceSlugSettingsRoute
   '/$workspaceSlug/': typeof WorkspaceSlugIndexRoute
+  '/$workspaceSlug/$projectId/board': typeof WorkspaceSlugProjectIdBoardRoute
+  '/$workspaceSlug/$projectId/list': typeof WorkspaceSlugProjectIdListRoute
+  '/$workspaceSlug/$projectId/issues/$issueNumber': typeof WorkspaceSlugProjectIdIssuesIssueNumberRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +78,9 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/$workspaceSlug/settings': typeof WorkspaceSlugSettingsRoute
   '/$workspaceSlug': typeof WorkspaceSlugIndexRoute
+  '/$workspaceSlug/$projectId/board': typeof WorkspaceSlugProjectIdBoardRoute
+  '/$workspaceSlug/$projectId/list': typeof WorkspaceSlugProjectIdListRoute
+  '/$workspaceSlug/$projectId/issues/$issueNumber': typeof WorkspaceSlugProjectIdIssuesIssueNumberRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,6 +89,9 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/$workspaceSlug/settings': typeof WorkspaceSlugSettingsRoute
   '/$workspaceSlug/': typeof WorkspaceSlugIndexRoute
+  '/$workspaceSlug/$projectId/board': typeof WorkspaceSlugProjectIdBoardRoute
+  '/$workspaceSlug/$projectId/list': typeof WorkspaceSlugProjectIdListRoute
+  '/$workspaceSlug/$projectId/issues/$issueNumber': typeof WorkspaceSlugProjectIdIssuesIssueNumberRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,6 +101,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/$workspaceSlug/settings'
     | '/$workspaceSlug/'
+    | '/$workspaceSlug/$projectId/board'
+    | '/$workspaceSlug/$projectId/list'
+    | '/$workspaceSlug/$projectId/issues/$issueNumber'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -78,6 +111,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/$workspaceSlug/settings'
     | '/$workspaceSlug'
+    | '/$workspaceSlug/$projectId/board'
+    | '/$workspaceSlug/$projectId/list'
+    | '/$workspaceSlug/$projectId/issues/$issueNumber'
   id:
     | '__root__'
     | '/'
@@ -85,6 +121,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/$workspaceSlug/settings'
     | '/$workspaceSlug/'
+    | '/$workspaceSlug/$projectId/board'
+    | '/$workspaceSlug/$projectId/list'
+    | '/$workspaceSlug/$projectId/issues/$issueNumber'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -93,6 +132,9 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   WorkspaceSlugSettingsRoute: typeof WorkspaceSlugSettingsRoute
   WorkspaceSlugIndexRoute: typeof WorkspaceSlugIndexRoute
+  WorkspaceSlugProjectIdBoardRoute: typeof WorkspaceSlugProjectIdBoardRoute
+  WorkspaceSlugProjectIdListRoute: typeof WorkspaceSlugProjectIdListRoute
+  WorkspaceSlugProjectIdIssuesIssueNumberRoute: typeof WorkspaceSlugProjectIdIssuesIssueNumberRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -132,6 +174,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceSlugSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$workspaceSlug/$projectId/list': {
+      id: '/$workspaceSlug/$projectId/list'
+      path: '/$workspaceSlug/$projectId/list'
+      fullPath: '/$workspaceSlug/$projectId/list'
+      preLoaderRoute: typeof WorkspaceSlugProjectIdListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$workspaceSlug/$projectId/board': {
+      id: '/$workspaceSlug/$projectId/board'
+      path: '/$workspaceSlug/$projectId/board'
+      fullPath: '/$workspaceSlug/$projectId/board'
+      preLoaderRoute: typeof WorkspaceSlugProjectIdBoardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$workspaceSlug/$projectId/issues/$issueNumber': {
+      id: '/$workspaceSlug/$projectId/issues/$issueNumber'
+      path: '/$workspaceSlug/$projectId/issues/$issueNumber'
+      fullPath: '/$workspaceSlug/$projectId/issues/$issueNumber'
+      preLoaderRoute: typeof WorkspaceSlugProjectIdIssuesIssueNumberRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -141,6 +204,10 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   WorkspaceSlugSettingsRoute: WorkspaceSlugSettingsRoute,
   WorkspaceSlugIndexRoute: WorkspaceSlugIndexRoute,
+  WorkspaceSlugProjectIdBoardRoute: WorkspaceSlugProjectIdBoardRoute,
+  WorkspaceSlugProjectIdListRoute: WorkspaceSlugProjectIdListRoute,
+  WorkspaceSlugProjectIdIssuesIssueNumberRoute:
+    WorkspaceSlugProjectIdIssuesIssueNumberRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

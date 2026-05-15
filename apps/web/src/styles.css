@@ -1,2 +1,53 @@
 @import "tailwindcss";
 @import "@radix-ui/themes/styles.css";
+
+/* Global focus ring — WCAG 2.4.7 */
+:focus-visible {
+  outline: 2px solid var(--accent-9);
+  outline-offset: 2px;
+  border-radius: var(--radius-1);
+}
+
+/* Draggable cards use tabIndex — ensure focus ring is always visible */
+[role="article"]:focus-visible {
+  outline: 2px solid var(--accent-9);
+  outline-offset: 2px;
+}
+
+/* Issue detail responsive layout */
+.issue-detail-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.issue-panel-desktop {
+  display: none;
+}
+
+.issue-panel-mobile {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .issue-detail-layout {
+    flex-direction: row;
+  }
+
+  .issue-panel-desktop {
+    display: block;
+  }
+
+  .issue-panel-mobile {
+    display: none;
+  }
+}
+
+/* Project card hover */
+.project-card:hover {
+  box-shadow: var(--shadow-3);
+}
+
+/* Sidebar nav item hover */
+.nav-item:hover {
+  background: var(--gray-3);
+}
