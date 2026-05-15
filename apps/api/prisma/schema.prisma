@@ -1,9 +1,13 @@
 generator client {
   provider = "prisma-client-js"
-  // Output to workspace root node_modules so the binary is found at runtime.
-  // process.cwd() = workspace root when `nx serve api` is called, so Prisma
-  // searches node_modules/.prisma/client relative to the workspace root.
-  output   = "../../../node_modules/@prisma/client"
+  // Output to workspace-root node_modules/.prisma/client so the engine binary
+  // lands at process.cwd()/node_modules/.prisma/client — the first path that
+  // Prisma's runtime engine resolver always searches (process.cwd() = workspace
+  // root when `nx serve api` is invoked).  The @prisma/client package at
+  // apps/api/node_modules/@prisma/client re-exports via
+  // require('.prisma/client/default'), and Node's module resolution walks up
+  // the tree to find workspace-root/node_modules/.prisma/client/ correctly.
+  output = "../../../node_modules/.prisma/client"
 }
 
 datasource db {

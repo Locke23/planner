@@ -25,7 +25,14 @@ export class RedisTokenService {
   }
 
   async revokeAll(userId: string): Promise<void> {
-    const keys = await this.redis.keys(`refresh:${userId}:*`);
-    if (keys.length > 0) await this.redis.del(...keys);
+    const pattern = `refresh:${userId}:*`;
+    let cursor = '0';
+    const keys: string[] = [];
+    do {
+      const [next, batch] = await this.redis.scan(cursor, 'MATCH', pattern, 'COUNT', 100);
+      cursor = next;
+      keys.push(...batch);
+    } while (cursor !== '0');
+    if (keys.length > 0) await this.redis.del(keys);
   }
 }
