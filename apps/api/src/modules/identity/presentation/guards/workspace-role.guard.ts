@@ -20,6 +20,7 @@ export class WorkspaceRoleGuard implements CanActivate {
 
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const request = ctx.switchToHttp().getRequest();
+    if (!request.user) throw new ForbiddenException('Not authenticated');
     const { userId } = request.user as { userId: string };
     const slug: string = request.params.slug;
 
